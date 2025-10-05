@@ -2,11 +2,15 @@ const express = require("express");
 const dbConnection = require("./config/dbConfiguration");
 const User = require("./models/users.model.js");
 const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
+const cookieParser = require("cookie-parser");
+const userAuthenticatoin = require("./middleware/auth.middleware.js");
 
 //initilize express into app
 const app = express();
 
 app.use(express.json());
+app.use(cookieParser());
 
 const PORT = process.env.PORT || 7000;
 
@@ -44,6 +48,8 @@ app.post("/login", async(req,res)=>{
         if(result){
             const isPassword  = await bcrypt.compare(password, result.password);
             if(isPassword){
+                const token = jwt.sign({_id: result._id}, "secretkey")
+                res.cookie("token", token)
                 res.status(200).send("Login successfull");
             }else{
                 res.status(400).send("invalid credentials");
@@ -57,41 +63,16 @@ app.post("/login", async(req,res)=>{
     }
 })
 
-//get user details by emailId
-app.get("/user", async (req, res) => {
-    const user = req?.body?.emailId;
+//get profile details
+app.get("/profile", userAuthenticatoin, async(req, res)=>{
     try {
-        const result = await User.find({ emailId: user });
-        console.log(result);
-
-        if (result?.length === 0) {
-            res.status(404).send("details not found", "use details not found based on emailId");
-        }
-        res.send("successfully fetched user details by emailId", result[0]);
-
-    } catch (err) {
-        res.status(400).send("error in fetching user details" + err.message);
+        const user = req.user;
+        res.status(200).send(user);   
+    } catch (error) {
+        res.status(500).send("error in fetch profile"+ err.message);
+        
     }
-
-});
-
-//update user data by emailId
-app.patch("/user/update", async (req, res) => {
-    const userEmailId = req.body.emailId;
-    const userFirstName = req.body.firstName;
-
-    try {
-        if (userEmailId) {
-            const result = User.updateOne({ emailId: userEmailId }, { firstName: userFirstName });
-            if (!result) res.status(404).send("could not update user details" + result.err);
-            res.status(200).send("user data updated successfully");
-        } else {
-            res.status(400).send("emailId should be required to update user data");
-        }
-    } catch (err) {
-        res.status(500).send("internal server error" + err.message);
-    }
-});
+})
 
 dbConnection().then(() => {
     console.log("DB connection has successfully established");
