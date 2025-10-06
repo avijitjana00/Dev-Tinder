@@ -5,7 +5,7 @@ const userAuthenticatoin = async (req, res, next) =>{
     try{
         const {token} = req.cookies;
     if(!token){
-        throw new error("invalid token!. Please login in");
+        throw new Error("invalid token!. Please login in");
     }
     const decodeToken =jwt.decode(token, "secretkey");
     const { _id } = decodeToken;
@@ -17,10 +17,10 @@ const userAuthenticatoin = async (req, res, next) =>{
         }
         res.status(404).send("user not found in the database");
     } else{
-        throw new error("token not valid")
+        throw new Error("token not valid")
     }
     }catch(err){
-        res.status(500).send("error in authenticate user" + err.message);
+        res.status(500).send("error in authenticate user " + err.message);
     }
 
 }
