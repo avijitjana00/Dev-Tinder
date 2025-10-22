@@ -1,7 +1,7 @@
 const express = require("express");
 const dbConnection = require("./config/dbConfiguration");
-const User = require("./models/users.model.js");
 const cookieParser = require("cookie-parser");
+const router = express.Router();
 
 //initilize express into app
 const app = express();
@@ -11,9 +11,8 @@ app.use(cookieParser());
 
 const PORT = process.env.PORT || 7000;
 
-const userRouter = require("./routers/user.routers.js");
-
-app.use("/", userRouter);
+require("./routers/user.routers.js")(router);
+app.use("/", router);
 
 dbConnection().then(() => {
     console.log("DB connection has successfully established");
