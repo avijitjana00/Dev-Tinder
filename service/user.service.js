@@ -1,0 +1,61 @@
+const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
+const { StatusCodes } = require("http-status-codes");
+const customException = require("../common/customException.js");
+const constants = require("../common/constants.js");
+const User = require("../models/users.model.js");
+const response = require("../common/response.js");
+const userQuery = require("../queries/user.query.js");
+const userAuthenticatoin = require("../middleware/auth.middleware.js");
+const { login } = require("../controller/user.controller.js");
+module.exports = {
+    //save user data
+    createUser: async function(userData){
+        try {
+            const {firstName, lastName, emailId, password, age, gender, photoUrl, skills, about} = userData;
+             const user = new User({
+                firstName,
+                lastName,
+                emailId,
+                password,
+                age, 
+                gender, 
+                photoUrl,
+                skills,
+                about
+            });
+
+            const hashPassword = await bcrypt.hash(password, 10);
+            user.password = hashPassword;
+
+            const result = await user.save();
+        
+            if(!result) return { error: customException.error(StatusCodes.INTERNAL_SERVER_ERROR, "Could not save user details", constants.UNKNOWN_ERROR_MESSAGE) }; 
+            return result;
+        } catch (err) {
+            return { error: err}
+        }
+    },
+    login: async function(data, res){
+        try {
+            const {emailId, password} = data;
+
+            const result = await userQuery.getUserByEmailId(emailId);
+            //const result = await User.findOne({emailId: emailId});
+            if(result){
+                const isPassword  = await bcrypt.compare(password, result.password);
+                if(isPassword){
+                    const token = jwt.sign({_id: result._id}, "secretkey", {expiresIn: '1D'})
+                    res.cookie("token", token)
+                    return true;
+                }else{
+                    return {error: customException.error(StatusCodes.INTERNAL_SERVER_ERROR, "Invalid credentials", "Invalid credentials") }; 
+                }
+            }else {
+                return { error: result.error}
+            }
+        } catch (err) {
+            return {error: err}
+        }
+    }
+}

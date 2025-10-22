@@ -1,5 +1,8 @@
 const User = require("../models/users.model.js");
 const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
+const { StatusCodes } = require("http-status-codes");
+const customException = require("../common/customException.js");
 
 module.exports = {
     //get user details by Id
@@ -16,12 +19,15 @@ module.exports = {
     //get user detials by emailId
     getUserByEmailId: async function(emailId) {
         try {
-            const result = User.findById(emailId);
-            if(!result) throw new Error("User not found in database");
+            const result = await User.findOne({emailId: emailId});
+            if(!result) return { error: customException.error(StatusCodes.INTERNAL_SERVER_ERROR, "User not found in database", "user not found") };
             return result;        
-        } catch (error) {
-            res.status(500).send("error in fetch user details by emailId"+ error.messsage);
+        } catch (err) {
+            return {error: err}
         }  
+    },
+    getUserProfile: async function(userData) {
+        return userData;
     },
     vlidatePassword: async function(emailId, password){
         try {

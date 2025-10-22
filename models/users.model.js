@@ -1,3 +1,4 @@
+const { string } = require("joi");
 const mongoose = require("mongoose");
 const validator = require("validator");
 
@@ -53,8 +54,11 @@ const UserSchema = new mongoose.Schema({
         }
 
     },
-    about: {
+    skills: {
         type: Array(String)
+    },
+    about: {
+        type: String
     }
 });
 
