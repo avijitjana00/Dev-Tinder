@@ -27,8 +27,9 @@ function validateProfileUpdate(req, res, next){
         if(!errorMessage){
             displayMessage = constants.INVALID_DATA_STRING;
         }
-        return res
+        return res;
     }
+    next();
 }
 
 function loginValidate(req, res, next){
@@ -48,7 +49,7 @@ function loginValidate(req, res, next){
         if(!errorMessage){
             displayMessage = constants.INVALID_DATA_STRING;
         }
-        return res
+        return res;
     }
-    next()
+    next();
 }

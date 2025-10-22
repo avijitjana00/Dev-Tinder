@@ -16,4 +16,6 @@ module.exports  = function (router){
     router.post("/logout", controller.logout);
     //fetch user details
     router.get("/profile/view", authMiddleware.userAuthenticatoin, controller.getUserProfile);
+    //edit user profile
+    router.patch("/profile/edit", authMiddleware.userAuthenticatoin, validator.validateProfileUpdate, controller.profileEdit);
 }

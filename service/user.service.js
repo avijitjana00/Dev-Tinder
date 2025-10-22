@@ -7,7 +7,7 @@ const User = require("../models/users.model.js");
 const response = require("../common/response.js");
 const userQuery = require("../queries/user.query.js");
 const userAuthenticatoin = require("../middleware/auth.middleware.js");
-const { login } = require("../controller/user.controller.js");
+const { login, profileEdit } = require("../controller/user.controller.js");
 module.exports = {
     //save user data
     createUser: async function(userData){
@@ -56,6 +56,23 @@ module.exports = {
             }
         } catch (err) {
             return {error: err}
+        }
+    },
+    profileEdit: async function (user, data) {
+        try {
+             if (!data || Object.keys(data).length == 0) {
+                 return {error: customException.error(StatusCodes.BAD_REQUEST, "No data found to be updated, please pass proper input", "No data found to be updated, please pass proper input")  };
+            }
+
+            // Update only provided keys from data
+            const updatedUser = await User.findByIdAndUpdate(
+                user._id,
+                { $set: data }, { new: true }
+            );
+            if(updatedUser) return updatedUser;
+            
+        } catch (error) {
+             res.status(StatusCodes.INTERNAL_SERVER_ERROR).send("error in update user profile, reason is ", error)
         }
     }
 }

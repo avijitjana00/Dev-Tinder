@@ -32,4 +32,12 @@ module.exports = {
             res.status(httpStatusCode).json(response.errorWith(httpStatusCode, result.error.messsage, result.error.displayMessage))
         } else return res.status(StatusCodes.OK).json(response.succesWith(result, StatusCodes.OK, "Fetch user profile details successfully", "Fetch user profile details successfully"));
     },
+    profileEdit: async function(req, res){
+        const result = await userService.profileEdit(req.user, req.body);
+        if(result?.error){
+            let httpStatusCode = StatusCodes.INTERNAL_SERVER_ERROR;
+            if(result.error.errorCode) httpStatusCode = result.error.errorCode;
+            res.status(httpStatusCode).json(response.errorWith(httpStatusCode, result.error.message, result.error.displayMessage))
+        } else return res.status(StatusCodes.OK).json(response.succesWith(result, StatusCodes.OK, "Profile edited successfully", "Profile edited successfully"));
+    },
 }
