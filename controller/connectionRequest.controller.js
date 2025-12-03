@@ -9,6 +9,6 @@ module.exports = {
                 let httpStatusCode = StatusCodes.INTERNAL_SERVER_ERROR;
                 if(result.error.errorCode) httpStatusCode = result.error.errorCode;
                 res.status(httpStatusCode).json(response.errorWith(httpStatusCode, result.error.message, result.error.displayMessage))
-            } else return res.status(StatusCodes.OK).json(response.succesWith(result, StatusCodes.OK, "Connection sed successfully", "Connection sed successfully"));
+            } else return res.status(StatusCodes.OK).json(response.succesWith(result, StatusCodes.OK, "Connection request sent successfully", "Connection request sent successfully"));
         },
 }
