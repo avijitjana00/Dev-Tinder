@@ -4,10 +4,7 @@ const { StatusCodes } = require("http-status-codes");
 const customException = require("../common/customException.js");
 const constants = require("../common/constants.js");
 const User = require("../models/users.model.js");
-const response = require("../common/response.js");
 const userQuery = require("../queries/user.query.js");
-const userAuthenticatoin = require("../middleware/auth.middleware.js");
-const { login, profileEdit } = require("../controller/user.controller.js");
 module.exports = {
     //save user data
     createUser: async function(userData){
@@ -52,7 +49,7 @@ module.exports = {
                     return {error: customException.error(StatusCodes.INTERNAL_SERVER_ERROR, "Invalid credentials", "Invalid credentials") }; 
                 }
             }else {
-                return { error: result.error}
+               return { error: customException.error(StatusCodes.INTERNAL_SERVER_ERROR, "User not found in db", "User not found in db") }; 
             }
         } catch (err) {
             return {error: err}
@@ -72,7 +69,7 @@ module.exports = {
             if(updatedUser) return updatedUser;
             
         } catch (error) {
-             res.status(StatusCodes.INTERNAL_SERVER_ERROR).send("error in update user profile, reason is ", error)
+             res.status(StatusCodes.INTERNAL_SERVER_ERROR).send("error in update user profile, reason is ", error);
         }
     }
 }

@@ -1,7 +1,3 @@
-const express = require("express");
-const bcrypt = require("bcrypt");
-const jwt = require("jsonwebtoken");
-const User = require("../models/users.model.js");
 const authMiddleware = require("../middleware/auth.middleware.js");
 const controller = require("../controller/user.controller.js");
 const validator = require("../validator/user.validator.js");

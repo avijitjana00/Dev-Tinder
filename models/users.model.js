@@ -1,4 +1,3 @@
-const { string } = require("joi");
 const mongoose = require("mongoose");
 const validator = require("validator");
 
@@ -60,7 +59,7 @@ const UserSchema = new mongoose.Schema({
     about: {
         type: String
     }
-});
+}, { timestamps: true });
 
 const User = mongoose.model("User", UserSchema);
 
