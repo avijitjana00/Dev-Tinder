@@ -1,8 +1,9 @@
 const User = require("../models/users.model.js");
 const bcrypt = require("bcrypt");
-const jwt = require("jsonwebtoken");
 const { StatusCodes } = require("http-status-codes");
 const customException = require("../common/customException.js");
+
+const ConnectionRequest = require("../models/connectionRequest.model.js");
 
 module.exports = {
     //get user details by Id
@@ -45,6 +46,21 @@ module.exports = {
         } catch (error) {
              throw new Error("error in validating password" + error.messsage);
         }
-    }
+    },
+    getPendingConnectionRequest: async function(req) {
+        try {
+            const loggedInUser = req.user;
+
+            const connectinRequest = ConnectionRequest.find({
+                toUserId: loggedInUser._id,
+                connectionStatus: "interested"
+            }).populate("fromUserId", ["firstName", "lastName", "photoUrl", "skills"])
+
+            if(connectinRequest) return connectinRequest;
+            return [];
+        } catch (e) {
+            return { error: e };
+        }
+    },
 }
 
