@@ -21,4 +21,7 @@ module.exports  = function (router){
 
     //get pending connection request
     router.get("/user/pending/request", authMiddleware.userAuthenticatoin, controller.getPendingConnectionRequest);
+
+    //get user connections
+    router.get("/user/connection", authMiddleware.userAuthenticatoin, controller.getUserConnection);
 }

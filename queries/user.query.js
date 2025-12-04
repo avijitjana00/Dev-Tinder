@@ -51,13 +51,31 @@ module.exports = {
         try {
             const loggedInUser = req.user;
 
-            const connectinRequest = ConnectionRequest.find({
+            const connectionRequest = ConnectionRequest.find({
                 toUserId: loggedInUser._id,
                 connectionStatus: "interested"
             }).populate("fromUserId", ["firstName", "lastName", "photoUrl", "skills"])
 
-            if(connectinRequest) return connectinRequest;
+            if(connectionRequest) return connectionRequest;
             return [];
+        } catch (e) {
+            return { error: e };
+        }
+    },
+    getUserConnection: async function(req) {
+        try {
+            const loggedInUser = req.user;
+
+            const connections = await ConnectionRequest.find({
+                $or: [
+                    { toUserId: loggedInUser._id, connectionStatus: "accepted" },
+                    { fromUserId:  loggedInUser._id, connectionStatus: "accepted" }
+                ]
+            }).populate("fromUserId", ["firstName", "lastName", "photoUrl", "skills"])
+
+            if (!connections || connections?.length === 0) return [];
+
+            return connections.map((conn) => conn.fromUserId);
         } catch (e) {
             return { error: e };
         }
