@@ -33,8 +33,34 @@ module.exports = {
             const data = await connectionRequest.save();
             if(data) return data;
 
-        } catch (error) {
-           res.status(StatusCodes.INTERNAL_SERVER_ERROR).send("error in sending connection request, reason is ", error); 
+        } catch (e) {
+            return { error: e}
         }
+    },
+    acceptOrRejectConnectionRequest: async function(req) {
+        try {
+            const loggedInUser = req.user;
+            const { status, requestId } = req.params;
+
+             const allowedStatus = ["accepted", "rejected"];
+            if(!allowedStatus.includes(status)) return {error: customException.error(StatusCodes.BAD_REQUEST, "Invalid status", "Invalid status")  };
+            
+             const connectionRequest = await ConnectionRequest.findOne({
+                _id: requestId,
+                toUserId: loggedInUser._id,
+                connectionStatus: "interested"
+            });
+            
+            if(!connectionRequest) return { error: customException.error(StatusCodes.BAD_REQUEST, "Connection request not found", "Connection request not found") };
+            
+            connectionRequest.connectionStatus  = status;
+            const data = await connectionRequest.save();
+            
+            if(data) return data;
+
+        } catch (e) {
+            return { error: e};
+        }
+        
     }
 }
