@@ -54,7 +54,7 @@ module.exports = {
             const connectionRequest = ConnectionRequest.find({
                 toUserId: loggedInUser._id,
                 connectionStatus: "interested"
-            }).populate("fromUserId", ["firstName", "lastName", "photoUrl", "skills"]);
+            }).populate("fromUserId", ["firstName", "lastName", "photoUrl", "skills about"]);
 
             if (connectionRequest) return connectionRequest;
             return [];
@@ -72,8 +72,8 @@ module.exports = {
                     { fromUserId: loggedInUser._id, connectionStatus: "accepted" }
                 ]
             })
-                .populate("fromUserId", ["firstName", "lastName", "photoUrl", "skills"])
-                .populate("toUserId", ["firstName", "lastName", "photoUrl", "skills"]);
+                .populate("fromUserId", ["firstName", "lastName", "photoUrl", "skills about"])
+                .populate("toUserId", ["firstName", "lastName", "photoUrl", "skills about"]);
 
             if (!connections || connections?.length === 0) return [];
 
@@ -83,6 +83,35 @@ module.exports = {
                 }
                 return conn.fromUserId;
             });
+        } catch (e) {
+            return { error: e };
+        }
+    },
+    getUserFeed: async function (req) {
+        try {
+            const loggedInUser = req.user;
+
+            const connectionRequest = await ConnectionRequest.find({
+                $or: [
+                    { fromUserId: loggedInUser._id }, 
+                    { toUserId: loggedInUser._id, }
+                ]
+            }).select("fromUserId toUserId");
+
+            const hideUserFromFeed = new Set();
+            connectionRequest.forEach((req) => {
+                hideUserFromFeed.add(req.fromUserId.toString());
+                hideUserFromFeed.add(req.toUserId.toString());
+            })
+
+            const users = User.find({
+                $and: [
+                    { _id: { $nin: Array.from(hideUserFromFeed) } },
+                    { _id: { $ne: loggedInUser._id } }
+                ]
+            }).select("firstName lastName photoUrl skills about")
+            if(users) return users;
+            return { error: customException.error(StatusCodes.NOT_FOUND, "User feed detials not found", "User feed details not found") };
         } catch (e) {
             return { error: e };
         }
