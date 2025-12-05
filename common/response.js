@@ -42,7 +42,6 @@ module.exports = {
         }
         return {
             httpStatusCode,
-            result: data,
             message,
             displayMessage,
             statu: 'Failure'
