@@ -91,6 +91,11 @@ module.exports = {
         try {
             const loggedInUser = req.user;
 
+            const page = req.query.page || 1;
+            let limit = req.query.limit || 10;
+            limit = limit > 20 ? 20 : limit;
+            const skip = (page - 1) * limit;
+
             const connectionRequest = await ConnectionRequest.find({
                 $or: [
                     { fromUserId: loggedInUser._id }, 
@@ -110,8 +115,11 @@ module.exports = {
                     { _id: { $ne: loggedInUser._id } }
                 ]
             }).select("firstName lastName photoUrl skills about")
+            .skip(skip)
+            .limit(limit);
+
             if(users) return users;
-            return { error: customException.error(StatusCodes.NOT_FOUND, "User feed detials not found", "User feed details not found") };
+            return [];
         } catch (e) {
             return { error: e };
         }
