@@ -15,8 +15,6 @@ const PORT = process.env.PORT || 7000;
 require("./routers/user.routers.js")(router);
 require("./routers/connectionRequest.router.js")(router);
 
-app.use("/", router);
-
 dbConnection().then(() => {
     console.log("DB connection has successfully established");
 
