@@ -44,7 +44,7 @@ module.exports = {
                 if(isPassword){
                     const token = jwt.sign({_id: result._id}, "secretkey", {expiresIn: '1D'})
                     res.cookie("token", token)
-                    return true;
+                    return result;
                 }else{
                     return {error: customException.error(StatusCodes.INTERNAL_SERVER_ERROR, "Invalid credentials", "Invalid credentials") }; 
                 }
