@@ -2,11 +2,13 @@ require("dotenv").config();
 const express = require("express");
 const dbConnection = require("./config/dbConfiguration");
 const cookieParser = require("cookie-parser");
+const cors = require("cors");
 const router = express.Router();
 
 //initilize express into app
 const app = express();
 
+app.use(cors());
 app.use(express.json());
 app.use(cookieParser());
 
