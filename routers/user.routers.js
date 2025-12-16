@@ -26,5 +26,5 @@ module.exports  = function (router){
     router.get("/user/connection", authMiddleware.userAuthenticatoin, controller.getUserConnection);
 
     // user feed
-    router.get("/user/feed", authMiddleware.userAuthenticatoin, controller.getUserFeed);
+    router.get("/feed", authMiddleware.userAuthenticatoin, controller.getUserFeed);
 }

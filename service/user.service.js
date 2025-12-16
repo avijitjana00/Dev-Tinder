@@ -61,15 +61,29 @@ module.exports = {
                  return {error: customException.error(StatusCodes.BAD_REQUEST, "No data found to be updated, please pass proper input", "No data found to be updated, please pass proper input")  };
             }
 
-            // Update only provided keys from data
+            // Allowed fields for update
+            const allowedFields = ['firstName', 'lastName', 'age', 'gender', 'photoUrl', 'skills', 'about'];
+            const filteredData = {};
+            for (const key in data) {
+                if (allowedFields.includes(key)) {
+                    filteredData[key] = data[key];
+                }
+            }
+
+            if (Object.keys(filteredData).length == 0) {
+                return {error: customException.error(StatusCodes.BAD_REQUEST, "No valid fields to update", "No valid fields to update")};
+            }
+
+            // Update only provided keys from filteredData
             const updatedUser = await User.findByIdAndUpdate(
                 user._id,
-                { $set: data }, { new: true }
+                { $set: filteredData }, { new: true }
             );
             if(updatedUser) return updatedUser;
+            else return {error: customException.error(StatusCodes.NOT_FOUND, "User not found", "User not found")};
             
         } catch (error) {
-             res.status(StatusCodes.INTERNAL_SERVER_ERROR).send("error in update user profile, reason is ", error);
+             return {error: error};
         }
     }
 }
