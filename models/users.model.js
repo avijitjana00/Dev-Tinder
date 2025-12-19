@@ -5,7 +5,7 @@ const UserSchema = new mongoose.Schema({
     firstName: {
         type: String,
         required: true,
-        minLength: 4,
+        minLength: 3,
         masLenght: 50
     },
     lastName: {
@@ -45,7 +45,6 @@ const UserSchema = new mongoose.Schema({
     },
     photoUrl: {
         type: String,
-        default: "https://picsum.photos/id/237/200/300",
         validate(value) {
             if (!validator.isURL(value)) {
                 throw new Error("Please pass proper image url");

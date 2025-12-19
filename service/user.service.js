@@ -7,16 +7,16 @@ const User = require("../models/users.model.js");
 const userQuery = require("../queries/user.query.js");
 module.exports = {
     //save user data
-    createUser: async function(userData){
+    createUser: async function (userData) {
         try {
-            const {firstName, lastName, emailId, password, age, gender, photoUrl, skills, about} = userData;
-             const user = new User({
+            const { firstName, lastName, emailId, password, age, gender, photoUrl, skills, about } = userData;
+            const user = new User({
                 firstName,
                 lastName,
                 emailId,
                 password,
-                age, 
-                gender, 
+                age,
+                gender,
                 photoUrl,
                 skills,
                 about
@@ -26,39 +26,40 @@ module.exports = {
             user.password = hashPassword;
 
             const result = await user.save();
-        
-            if(!result) return { error: customException.error(StatusCodes.INTERNAL_SERVER_ERROR, "Could not save user details", constants.UNKNOWN_ERROR_MESSAGE) }; 
-            return result;
+            const token = jwt.sign({ _id: result._id }, "secretkey", { expiresIn: '1D' });
+
+            if (!result) return { error: customException.error(StatusCodes.INTERNAL_SERVER_ERROR, "Could not save user details", constants.UNKNOWN_ERROR_MESSAGE) };
+            return { user: result, token: token };
         } catch (err) {
-            return { error: err}
+            return { error: err };
         }
     },
-    login: async function(data, res){
+    login: async function (data, res) {
         try {
-            const {emailId, password} = data;
+            const { emailId, password } = data;
 
             const result = await userQuery.getUserByEmailId(emailId);
             //const result = await User.findOne({emailId: emailId});
-            if(result){
-                const isPassword  = await bcrypt.compare(password, result.password);
-                if(isPassword){
-                    const token = jwt.sign({_id: result._id}, "secretkey", {expiresIn: '1D'})
-                    res.cookie("token", token)
+            if (result) {
+                const isPassword = await bcrypt.compare(password, result.password);
+                if (isPassword) {
+                    const token = jwt.sign({ _id: result._id }, "secretkey", { expiresIn: '1D' });
+                    res.cookie("token", token);
                     return result;
-                }else{
-                    return {error: customException.error(StatusCodes.INTERNAL_SERVER_ERROR, "Invalid credentials", "Invalid credentials") }; 
+                } else {
+                    return { error: customException.error(StatusCodes.INTERNAL_SERVER_ERROR, "Invalid credentials", "Invalid credentials") };
                 }
-            }else {
-               return { error: customException.error(StatusCodes.INTERNAL_SERVER_ERROR, "User not found in db", "User not found in db") }; 
+            } else {
+                return { error: customException.error(StatusCodes.INTERNAL_SERVER_ERROR, "User not found in db", "User not found in db") };
             }
         } catch (err) {
-            return {error: err}
+            return { error: err };
         }
     },
     profileEdit: async function (user, data) {
         try {
-             if (!data || Object.keys(data).length == 0) {
-                 return {error: customException.error(StatusCodes.BAD_REQUEST, "No data found to be updated, please pass proper input", "No data found to be updated, please pass proper input")  };
+            if (!data || Object.keys(data).length == 0) {
+                return { error: customException.error(StatusCodes.BAD_REQUEST, "No data found to be updated, please pass proper input", "No data found to be updated, please pass proper input") };
             }
 
             // Allowed fields for update
@@ -71,7 +72,7 @@ module.exports = {
             }
 
             if (Object.keys(filteredData).length == 0) {
-                return {error: customException.error(StatusCodes.BAD_REQUEST, "No valid fields to update", "No valid fields to update")};
+                return { error: customException.error(StatusCodes.BAD_REQUEST, "No valid fields to update", "No valid fields to update") };
             }
 
             // Update only provided keys from filteredData
@@ -79,11 +80,11 @@ module.exports = {
                 user._id,
                 { $set: filteredData }, { new: true }
             );
-            if(updatedUser) return updatedUser;
-            else return {error: customException.error(StatusCodes.NOT_FOUND, "User not found", "User not found")};
-            
+            if (updatedUser) return updatedUser;
+            else return { error: customException.error(StatusCodes.NOT_FOUND, "User not found", "User not found") };
+
         } catch (error) {
-             return {error: error};
+            return { error: error };
         }
     }
-}
+};
