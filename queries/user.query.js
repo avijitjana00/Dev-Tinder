@@ -54,7 +54,7 @@ module.exports = {
             const connectionRequest = ConnectionRequest.find({
                 toUserId: loggedInUser._id,
                 connectionStatus: "interested"
-            }).populate("fromUserId", ["firstName", "lastName", "photoUrl", "skills about"]);
+            }).populate("fromUserId", ["firstName", "lastName", "age", "gender", "photoUrl", "skills", "about"]);
 
             if (connectionRequest) return connectionRequest;
             return [];
