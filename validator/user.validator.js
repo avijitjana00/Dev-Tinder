@@ -8,13 +8,13 @@ module.exports = {
 
 function validateProfileUpdate(req, res, next) {
     const request = Joi.object({
-        firstName: Joi.string().not(null).optional(),
+        firstName: Joi.string().not(null).required(),
         lastName: Joi.string().allow(null).optional(),
         age: Joi.number().not(0).positive().optional(),
-        gender: Joi.string().not(null).optional(),
-        photoUrl: Joi.string().allow(null).optional(),
-        skills: Joi.array().items(Joi.string().required()).optional().allow(null),
-        about: Joi.string().allow(null).optional()
+        gender: Joi.string().allow(null, '').optional(),
+        photoUrl: Joi.string().allow(null, '').optional(),
+        skills: Joi.array().items(Joi.string().allow('')).optional().allow(null),
+        about: Joi.string().allow(null, '').optional()
     });
     const { error } = request.validate(req.body);
 
