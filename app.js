@@ -25,7 +25,7 @@ app.use("/", router);
 dbConnection().then(() => {
     console.log("DB connection has successfully established");
 
-    app.listen(7000, () => {
+    app.listen(process.env.PORT, () => {
         console.log(`app is listening on port http://localhost:${PORT}`);
 
     });
