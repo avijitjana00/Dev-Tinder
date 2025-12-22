@@ -11,18 +11,18 @@ module.exports = {
             const status = req.params.status;
 
             const allowedStatus = ["ignored", "interested"];
-            if(!allowedStatus.includes(status)) return {error: customException.error(StatusCodes.BAD_REQUEST, "Invalid status", "Invalid status")  };
-            
+            if (!allowedStatus.includes(status)) return { error: customException.error(StatusCodes.BAD_REQUEST, "Invalid status", "Invalid status") };
+
             const toUser = await User.findById(toUserId);
-            if(!toUser) return {error: customException.error(StatusCodes.BAD_REQUEST, "User not found", "User not found")  };
+            if (!toUser) return { error: customException.error(StatusCodes.BAD_REQUEST, "User not found", "User not found") };
 
             const existingConnectionRequest = await ConnectionRequest.findOne({
-                $or:[
-                    {fromUserId: toUserId},
-                    {fromUserId: toUserId, toUserId: fromUserId}
+                $or: [
+                    { fromUserId: fromUserId, toUserId: toUserId },
+                    { fromUserId: toUserId, toUserId: fromUserId }
                 ]
             });
-             if(existingConnectionRequest) return {error: customException.error(StatusCodes.BAD_REQUEST, "Connection request already exists", "Connection request already exists")  };
+            if (existingConnectionRequest) return { error: customException.error(StatusCodes.BAD_REQUEST, "Connection request already exists", "Connection request already exists") };
 
             const connectionRequest = new ConnectionRequest({
                 fromUserId,
@@ -31,36 +31,36 @@ module.exports = {
             });
 
             const data = await connectionRequest.save();
-            if(data) return data;
+            if (data) return data;
 
         } catch (e) {
-            return { error: e}
+            return { error: e };
         }
     },
-    acceptOrRejectConnectionRequest: async function(req) {
+    acceptOrRejectConnectionRequest: async function (req) {
         try {
             const loggedInUser = req.user;
             const { status, requestId } = req.params;
 
-             const allowedStatus = ["accepted", "rejected"];
-            if(!allowedStatus.includes(status)) return {error: customException.error(StatusCodes.BAD_REQUEST, "Invalid status", "Invalid status")  };
-            
-             const connectionRequest = await ConnectionRequest.findOne({
+            const allowedStatus = ["accepted", "rejected"];
+            if (!allowedStatus.includes(status)) return { error: customException.error(StatusCodes.BAD_REQUEST, "Invalid status", "Invalid status") };
+
+            const connectionRequest = await ConnectionRequest.findOne({
                 _id: requestId,
                 toUserId: loggedInUser._id,
                 connectionStatus: "interested"
             });
-            
-            if(!connectionRequest) return { error: customException.error(StatusCodes.BAD_REQUEST, "Connection request not found", "Connection request not found") };
-            
-            connectionRequest.connectionStatus  = status;
+
+            if (!connectionRequest) return { error: customException.error(StatusCodes.BAD_REQUEST, "Connection request not found", "Connection request not found") };
+
+            connectionRequest.connectionStatus = status;
             const data = await connectionRequest.save();
-            
-            if(data) return data;
+
+            if (data) return data;
 
         } catch (e) {
-            return { error: e};
+            return { error: e };
         }
-        
+
     }
-}
+};

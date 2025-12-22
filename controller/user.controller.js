@@ -10,7 +10,10 @@ module.exports = {
             let httpStatusCode = StatusCodes.INTERNAL_SERVER_ERROR;
             if(result.error.errorcode) httpStatusCode = result.error.errorcode;
             res.status(httpStatusCode).json(response.errorWith(httpStatusCode, result.error.messsage, result.error.displayMessage))
-        } else return res.status(StatusCodes.OK).json(response.succesWith(result, StatusCodes.OK, "User saved successfully", "User saved successfully"));
+        } else {
+            res.cookie("token", result.token);
+            return res.status(StatusCodes.OK).json(response.succesWith(result.user, StatusCodes.OK, "User saved successfully", "User saved successfully"));
+        }
     },
     login: async function(req, res){
         const result = await userService.login(req.body, res);

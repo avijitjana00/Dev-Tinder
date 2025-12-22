@@ -23,8 +23,8 @@ module.exports  = function (router){
     router.get("/user/pending/request", authMiddleware.userAuthenticatoin, controller.getPendingConnectionRequest);
 
     //get user connections
-    router.get("/user/connection", authMiddleware.userAuthenticatoin, controller.getUserConnection);
+    router.get("/user/connections", authMiddleware.userAuthenticatoin, controller.getUserConnection);
 
     // user feed
-    router.get("/user/feed", authMiddleware.userAuthenticatoin, controller.getUserFeed);
+    router.get("/feed", authMiddleware.userAuthenticatoin, controller.getUserFeed);
 }

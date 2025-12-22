@@ -54,7 +54,7 @@ module.exports = {
             const connectionRequest = ConnectionRequest.find({
                 toUserId: loggedInUser._id,
                 connectionStatus: "interested"
-            }).populate("fromUserId", ["firstName", "lastName", "photoUrl", "skills about"]);
+            }).populate("fromUserId", ["firstName", "lastName", "age", "gender", "photoUrl", "skills", "about"]);
 
             if (connectionRequest) return connectionRequest;
             return [];
@@ -72,8 +72,8 @@ module.exports = {
                     { fromUserId: loggedInUser._id, connectionStatus: "accepted" }
                 ]
             })
-                .populate("fromUserId", ["firstName", "lastName", "photoUrl", "skills about"])
-                .populate("toUserId", ["firstName", "lastName", "photoUrl", "skills about"]);
+                .populate("fromUserId", ["firstName", "lastName", "age", "gender", "photoUrl", "skills", "about"])
+                .populate("toUserId", ["firstName", "lastName", "age", "gender", "photoUrl", "skills", "about"]);
 
             if (!connections || connections?.length === 0) return [];
 
@@ -98,7 +98,7 @@ module.exports = {
 
             const connectionRequest = await ConnectionRequest.find({
                 $or: [
-                    { fromUserId: loggedInUser._id }, 
+                    { fromUserId: loggedInUser._id },
                     { toUserId: loggedInUser._id, }
                 ]
             }).select("fromUserId toUserId");
@@ -107,7 +107,7 @@ module.exports = {
             connectionRequest.forEach((req) => {
                 hideUserFromFeed.add(req.fromUserId.toString());
                 hideUserFromFeed.add(req.toUserId.toString());
-            })
+            });
 
             const users = User.find({
                 $and: [
@@ -115,10 +115,10 @@ module.exports = {
                     { _id: { $ne: loggedInUser._id } }
                 ]
             }).select("firstName lastName photoUrl skills about")
-            .skip(skip)
-            .limit(limit);
+                .skip(skip)
+                .limit(limit);
 
-            if(users) return users;
+            if (users) return users;
             return [];
         } catch (e) {
             return { error: e };
