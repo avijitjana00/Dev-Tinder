@@ -9,7 +9,7 @@ const userAuthenticatoin = async (req, res, next) =>{
     if(!token){
         throw new Error("invalid token!. Please login in");
     }
-    const decodeToken =jwt.decode(token, "secretkey");
+    const decodeToken =jwt.decode(token, process.env.SECRET_KEY);
     const { _id } = decodeToken;
     if(_id){
         const user = await User.findById(_id);

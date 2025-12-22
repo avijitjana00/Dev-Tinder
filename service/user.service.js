@@ -26,7 +26,7 @@ module.exports = {
             user.password = hashPassword;
 
             const result = await user.save();
-            const token = jwt.sign({ _id: result._id }, "secretkey", { expiresIn: '1D' });
+            const token = jwt.sign({ _id: result._id }, process.env.SECRET_KEY, { expiresIn: '1D' });
 
             if (!result) return { error: customException.error(StatusCodes.INTERNAL_SERVER_ERROR, "Could not save user details", constants.UNKNOWN_ERROR_MESSAGE) };
             return { user: result, token: token };
@@ -43,7 +43,7 @@ module.exports = {
             if (result) {
                 const isPassword = await bcrypt.compare(password, result.password);
                 if (isPassword) {
-                    const token = jwt.sign({ _id: result._id }, "secretkey", { expiresIn: '1D' });
+                    const token = jwt.sign({ _id: result._id }, process.env.SECRET_KEY, { expiresIn: '1D' });
                     res.cookie("token", token);
                     return result;
                 } else {
