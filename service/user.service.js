@@ -57,6 +57,7 @@ module.exports = {
                 return { error: customException.error(StatusCodes.INTERNAL_SERVER_ERROR, "User not found in db", "User not found in db") };
             }
         } catch (err) {
+            console.log(err);
             return { error: err };
         }
     },
