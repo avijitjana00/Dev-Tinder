@@ -44,7 +44,11 @@ module.exports = {
                 const isPassword = await bcrypt.compare(password, result.password);
                 if (isPassword) {
                     const token = jwt.sign({ _id: result._id }, process.env.SECRET_KEY, { expiresIn: '1D' });
-                    res.cookie("token", token);
+                    res.cookie("token", token, {
+                        httpOnly: true,
+                        secure: false, // MUST be false for HTTP
+                        sameSite: "lax"
+                    });
                     return result;
                 } else {
                     return { error: customException.error(StatusCodes.INTERNAL_SERVER_ERROR, "Invalid credentials", "Invalid credentials") };
