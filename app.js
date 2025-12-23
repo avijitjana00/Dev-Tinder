@@ -9,7 +9,7 @@ const router = express.Router();
 const app = express();
 
 app.use(cors({
-    origin: true,
+    origin: process.env.DOMAIN,
     credentials: true
 }));
 app.use(express.json());
