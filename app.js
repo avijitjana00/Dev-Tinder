@@ -9,12 +9,13 @@ const router = express.Router();
 const app = express();
 
 app.use(cors({
-    origin: true,
+    origin: process.env.DOMAIN,
     credentials: true
 }));
 app.use(express.json());
 app.use(cookieParser());
 
+app.set("trust proxy", 1);
 const PORT = process.env.PORT || 7000;
 
 require("./routers/user.routers.js")(router);
