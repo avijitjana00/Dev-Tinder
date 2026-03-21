@@ -5,6 +5,9 @@ const cookieParser = require("cookie-parser");
 const cors = require("cors");
 const router = express.Router();
 
+const http = require("http");
+const initializeSocket = require("./utils/chatServer.js");
+
 //initilize express into app
 const app = express();
 
@@ -23,10 +26,14 @@ require("./routers/connectionRequest.router.js")(router);
 
 app.use("/", router);
 
+const server = http.createServer(app);
+initializeSocket(server);
+
+
 dbConnection().then(() => {
     console.log("DB connection has successfully established");
 
-    app.listen(process.env.PORT, () => {
+    server.listen(process.env.PORT, () => {
         console.log(`app is listening on port http://localhost:${PORT}`);
 
     });
