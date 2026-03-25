@@ -2,6 +2,7 @@ const { StatusCodes } = require("http-status-codes");
 const customException = require("../common/customException.js");
 const User = require("../models/users.model.js");
 const ConnectionRequest = require("../models/connectionRequest.model.js");
+const sendEmail = require("../utils/sendEmail.js");
 
 module.exports = {
     sendConnectionRequest: async function (req) {
@@ -31,7 +32,12 @@ module.exports = {
             });
 
             const data = await connectionRequest.save();
-            if (data) return data;
+            if (data) {
+                //send email notification to toUser
+                const mailRes = await sendEmail.run("You have a new connection request form " + toUser.emailId, "Connection Request from DevTinder");
+                console.log("Email sent result: ", mailRes);
+                return data;
+            };
 
         } catch (e) {
             return { error: e };
